@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fondo: #09090b;
+  --color-superficie: #18181b;
+  --color-borde: #27272a;
+  --color-texto: #fafafa;
+  --color-apagado: #a1a1aa;
+  --color-acento: #818cf8;
+  --font-sans: var(--fuente-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  min-width: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* El header fijo no debe tapar la sección a la que se salta */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-acento) 35%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Rejilla tenue de fondo, estilo Linear */
+.rejilla {
+  background-image:
+    linear-gradient(to right, #ffffff0a 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff0a 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+.cristal {
+  background-color: #18181bb3;
+  backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid var(--color-borde);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Fondo animado ──────────────────────────────────────────────────────── */
+
+.fondo-animado {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Cada capa mide un mosaico más de alto y sube exactamente un mosaico: así el
+   bucle no tiene costura. Solo se anima transform y opacity (compositor). */
+.particulas {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  will-change: transform;
+  animation: derivar linear infinite, titilar ease-in-out infinite alternate;
+}
+
+.particulas-1 {
+  height: calc(100% + 140px);
+  background-image:
+    radial-gradient(circle, #ffffff 0.9px, transparent 1px),
+    radial-gradient(circle, #a5b4fc 0.9px, transparent 1px);
+  background-size: 140px 140px, 140px 140px;
+  background-position: 0 0, 70px 95px;
+  opacity: 0.22;
+  animation-duration: 26s, 6s;
+  --deriva: -140px;
+}
+
+.particulas-2 {
+  height: calc(100% + 210px);
+  background-image: radial-gradient(circle, #ffffff 1.3px, transparent 1.6px);
+  background-size: 210px 210px;
+  background-position: 55px 30px;
+  opacity: 0.16;
+  animation-duration: 44s, 9s;
+  --deriva: -210px;
+}
+
+.particulas-3 {
+  height: calc(100% + 300px);
+  background-image: radial-gradient(circle, #c7d2fe 2px, transparent 2.4px);
+  background-size: 300px 300px;
+  background-position: 160px 120px;
+  opacity: 0.14;
+  animation-duration: 70s, 13s;
+  --deriva: -300px;
+}
+
+@keyframes derivar {
+  to {
+    transform: translate3d(0, var(--deriva), 0);
+  }
+}
+
+@keyframes titilar {
+  from {
+    filter: brightness(0.75);
+  }
+  to {
+    filter: brightness(1.6);
+  }
+}
+
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(130px);
+  will-change: transform;
+  animation: flotar ease-in-out infinite alternate;
+}
+
+.aurora-1 {
+  left: -10%;
+  top: 10%;
+  width: min(70vw, 34rem);
+  aspect-ratio: 1;
+  background: #6366f11a;
+  animation-duration: 22s;
+  --dx: 18vw;
+  --dy: 10vh;
+}
+
+.aurora-2 {
+  right: -12%;
+  bottom: 5%;
+  width: min(65vw, 30rem);
+  aspect-ratio: 1;
+  background: #22d3ee12;
+  animation-duration: 31s;
+  animation-delay: -8s;
+  --dx: -14vw;
+  --dy: -12vh;
+}
+
+@keyframes flotar {
+  to {
+    transform: translate3d(var(--dx), var(--dy), 0) scale(1.15);
+  }
+}
+
+/* Foco que sigue al puntero; JS solo escribe --x / --y */
+.foco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34rem;
+  height: 34rem;
+  margin: -17rem 0 0 -17rem;
+  translate: var(--x, 50vw) var(--y, 50vh);
+  background: radial-gradient(circle, #818cf824 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+@media (hover: none) {
+  .foco {
+    display: none;
+  }
+}
